@@ -5,6 +5,7 @@
 var Music = require('../models').Music;
 var Musician = require('../models').Musician
 var Tag = require('../models').Tag;
+var Validator = require('validatorjs');
 
 module.exports = {
   fetch_current_musician(req, res){
@@ -21,6 +22,7 @@ module.exports = {
         return res.json({me: musician});
       })
       .catch((error) => {
+        console.log(error);
         return res.status(404).json({message: 'Failed to find musician.'});
       });
 
@@ -31,13 +33,13 @@ module.exports = {
     // get the user's musician profile
     Musician.findById(req.session.musicianId)
       .then((musician)=>{
-        // TODO: Delete the old picture
+
         musician.picture = 'photos/'+req.file.filename;
         musician.save();
         res.json({message: 'successfully uploaded file.'})
       })
       .catch(()=>{
-        // TODO: Delete the file that was uploaded
+
         res.status(422).json({error: 'Failed to upload picture.'});
       });
   },
@@ -46,6 +48,18 @@ module.exports = {
     // file uploaded is in req.file
     // get the user's musician profile
     var title = req.body.title;
+    console.log('title!');
+    console.log(title);
+
+    var validation = new Validator(
+      { title: title },
+      { title: 'required|min:5|max:45'}
+    );
+
+    if(validation.fails()){
+      return res.status(422).json({error: 'invalid title'});
+    }
+
     Music.create({
       musicianId: req.session.musicianId,
       path: 'music/'+req.file.filename,
@@ -62,9 +76,24 @@ module.exports = {
   },
 
   addTag(req, res){
-    // TODO: Validation
     var value = req.body.value;
     var type = req.body.type;
+
+    var validation = new Validator(
+      {
+        value: value,
+        type: type
+      },
+      {
+        value: 'required|min:3|max:45',
+        type: 'required|numeric|min:0|max:1'
+      }
+    );
+
+    if(validation.fails()){
+      return res.status(422).json({error: 'failed to validate tag'});
+    }
+
     var newTag = {};
     console.log('type!');
     console.log(type);
@@ -95,7 +124,6 @@ module.exports = {
         res.json({message: 'tag has been removed.'});
       })
       .catch(()=>{
-        // TODO: Delete the file that was uploaded
         res.status(422).json({error: 'Failed to delete tag.'});
       });
   },
@@ -111,7 +139,6 @@ module.exports = {
         res.json({message: 'music has been removed.'});
       })
       .catch(()=>{
-        // TODO: Delete the file that was uploaded
         res.status(422).json({error: 'Failed to delete music.'});
       });
   }

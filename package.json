@@ -10,7 +10,8 @@
     "multer": "^1.1.0",
     "mysql": "^2.10.2",
     "q": "^1.4.1",
-    "sequelize": "^3.21.0"
+    "sequelize": "^3.21.0",
+    "validatorjs": "^2.0.5"
   },
   "devDependencies": {
     "chai": "^3.5.0",

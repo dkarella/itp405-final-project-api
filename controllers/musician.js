@@ -59,10 +59,11 @@ module.exports = {
         musicians = musicians.concat(musiciansFromTagResponse);
       }
 
-      // filter out repeated musicians
-      if(musicians.length > 2){
+      // filter out repeated musicians and admins
+      if(musicians.length > 0){
         var uniqueMusicians = {};
         musicians = musicians.filter(function(musician){
+          console.log(musician);
           if(uniqueMusicians[musician.id]){
             return false;
           }

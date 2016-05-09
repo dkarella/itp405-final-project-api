@@ -7,7 +7,6 @@ var secret = require('../config').secret;
 
 module.exports = function(req, res, next){
   var token = req.body.token || req.query.token || req.headers.token;
-
   if(!token) return res.status(401).json({message: 'Please log in first!'});
 
   // verifies secret and checks exp

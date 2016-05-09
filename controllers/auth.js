@@ -3,6 +3,7 @@ var secret = require('../config').secret;
 var Auth = require('../models').Auth;
 var Musician = require('../models').Musician;
 var jwt = require('jsonwebtoken');
+var Validator = require('validatorjs');
 
 module.exports = {
   register(req, res){
@@ -12,6 +13,30 @@ module.exports = {
     var password = req.body.password;
     var firstName = req.body.first_name;
     var lastName = req.body.last_name;
+
+    var validation = new Validator(
+      {
+        username: username,
+        password: password,
+        firstName: firstName,
+        lastName: lastName,
+      },
+      {
+        username: 'required|min:5|max:45',
+        password: 'required|min:5|max:45',
+        firstName: 'required|max:45',
+        lastName: 'required|max:45',
+      }
+    )
+
+
+    if(validation.fails()){
+      var arrayOfErrors = [];
+      for (var key in validation.errors.errors){
+        arrayOfErrors = arrayOfErrors.concat(validation.errors.get(key));
+      }
+      return res.status(422).json({errors: arrayOfErrors});
+    }
 
     // Create Musician profile
     Musician.build({
@@ -78,6 +103,21 @@ module.exports = {
     var username = req.body.username;
     var password = req.body.password;
 
+    var validation = new Validator(
+      {
+        username: username,
+        password: password
+      },
+      {
+        username: 'required|min:5|max:45',
+        password: 'required|min:5|max:45'
+      }
+    )
+
+    if(validation.fails()){
+      return res.status(401).json({errors: ['Incorrect username/password.']})
+    }
+
     // find the user in the database
     Auth.findOne({
       where: {username: username}
@@ -102,12 +142,12 @@ module.exports = {
           return res.json({message: 'Login successful', token:token});
         });
       } else {
-        return res.status(404).json({error: 'Invalid username/password.'});
+        return res.status(401).json({errors: ['Incorrect username/password.']});
       }
 
     }).catch((error) => {
       console.log(error);
-      return res.status(422).json({message: 'Error looking for user in database'});
+      return res.status(401).json({errors: ['Incorrect username/password.']});
     });
   },
 

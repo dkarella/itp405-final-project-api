@@ -13,10 +13,6 @@ var Musician = db.define('musician', {
     picture: {
       type: Sequelize.STRING,
       field: 'picture'
-    },
-    bio: {
-      type: Sequelize.STRING,
-      field: 'bio'
     }
   },
   {
