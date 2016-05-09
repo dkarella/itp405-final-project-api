@@ -9,7 +9,7 @@ describe('Authorize Middleware', function(){
     it('should drop a request to a protected route if no token is given', function(done){
       request(app)
         .post('/api/v1/validate_token')
-        .expect(200, done);
+        .expect(401, done);
     });
 
     it('should drop a request to a protected route if an invalid token is given', function(done){
